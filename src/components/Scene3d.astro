@@ -1,0 +1,95 @@
+---
+---
+
+<div id="scene-container"></div>
+
+<script>
+	import * as THREE from 'three';
+	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+	// Scene setup
+	const container = document.getElementById('scene-container');
+	const scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+	const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+	// Set renderer size to fill browser
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	container.appendChild(renderer.domElement);
+
+	// Create a simple environment
+	// Add a cube
+	const geometry = new THREE.BoxGeometry(1, 1, 1);
+	const material = new THREE.MeshStandardMaterial({ 
+		color: 0x6495ED,
+		roughness: 0.5,
+		metalness: 0.2
+	});
+	const cube = new THREE.Mesh(geometry, material);
+	scene.add(cube);
+
+	// Add a floor
+	const floorGeometry = new THREE.PlaneGeometry(20, 20);
+	const floorMaterial = new THREE.MeshStandardMaterial({ 
+		color: 0x999999,
+		roughness: 0.8,
+		metalness: 0.1
+	});
+	const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.rotation.x = -Math.PI / 2; // Rotate to be horizontal
+	floor.position.y = -1;
+	scene.add(floor);
+
+	// Add ambient light
+	const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+	scene.add(ambientLight);
+
+	// Add directional light (like sunlight)
+	const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+	directionalLight.position.set(5, 5, 5);
+	directionalLight.castShadow = true;
+	scene.add(directionalLight);
+
+	// Position camera
+	camera.position.z = 5;
+	camera.position.y = 1;
+
+	// Handle window resize
+	window.addEventListener('resize', () => {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	});
+
+	// Add orbit controls
+	const controls = new OrbitControls(camera, renderer.domElement);
+	controls.enableDamping = true;
+	controls.dampingFactor = 0.05;
+
+	// Animation loop
+	function animate() {
+		requestAnimationFrame(animate);
+
+		controls.update(); // Update controls in animation loop
+
+		cube.rotation.x += 0.005;
+		cube.rotation.y += 0.005;
+		
+		renderer.render(scene, camera);
+	}
+
+	// Start animation
+	animate();
+
+	// Add a skybox (simple version)
+	scene.background = new THREE.Color(0x1a1a2e);
+</script>
+
+<style>
+	#scene-container {
+		width: 100%;
+		height: 100vh;
+		display: block;
+	}
+</style>
